@@ -10,7 +10,7 @@ NUM @ 1 ?do
       SUM @ i r> + SUM !
     then
   loop
-  NUM @ .nl NUM @ SUM @ = if
+  NUM @ SUM @ = if
     SUM @ .nl
   then
   0 SUM !

@@ -1,0 +1,7 @@
+fib :
+  TERM ! VAL ! PREV !
+  TERM @ 0 = if PREV @ else
+    VAL @ dup PREV @ + TERM @ 1 - .stack fib
+  then ;
+
+0 1 40 fib .nl

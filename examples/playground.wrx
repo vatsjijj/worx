@@ -8,7 +8,7 @@ r@ 1 ?do
       i r> +
     then
   loop
-  r@ .nl r@ swap >r r@ = if
+  r@ swap >r r@ = if
     r@ .nl
   then
   r>
