@@ -16,3 +16,5 @@ NUM @ 1 ?do
   0 SUM !
   NUM @ 1 - NUM !
 loop
+
+NUM SUM del del
