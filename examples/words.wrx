@@ -1,0 +1,23 @@
+newswap : ( x1 x2 -- x2 x1 )
+  []ivswap ! >r []ivswap @ r> []ivswap del ;
+
+new2drop : ( x1 x2 -- )
+  drop drop ;
+
+newnip : ( x1 x2 -- x2 )
+  newswap drop ;
+
+newdup : ( x1 -- x1 x1 )
+  []ivdup ! []ivdup @ []ivdup @ []ivdup del ;
+
+newrot : ( x1 x2 x3 -- x2 x3 x1 )
+  >r newswap r> newswap ;
+
+newover : ( x1 x2 -- x1 x2 x1 )
+  >r newdup r> newswap ;
+
+1 2 newswap .stack new2drop
+1 2 newnip .stack drop
+1 newdup .stack new2drop
+1 2 3 newrot .stack new2drop drop
+1 2 newover .stack new2drop drop

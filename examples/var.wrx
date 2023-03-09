@@ -1,0 +1,3 @@
+x variable
+12 x !
+x @ .stack drop

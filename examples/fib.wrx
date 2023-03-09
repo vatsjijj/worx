@@ -1,0 +1,4 @@
+fib : ( n1 -- n2 )
+  0 1 rot 0 ?do over + swap loop drop ;
+
+20 fib .nl ( 6765 )

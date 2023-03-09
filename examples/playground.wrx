@@ -1,0 +1,18 @@
+"Start" .nl
+
+0 2000 >r
+
+r@ 1 ?do
+  r@ 1 ?do
+    r@ i r> % 0 = if
+      i r> +
+    then
+  loop
+  r@ .nl r@ swap >r r@ = if
+    r@ .nl
+  then
+  r>
+  drop
+  0
+  r> 1 - >r
+loop

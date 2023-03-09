@@ -1,0 +1,8 @@
+1 0 lshift .nl
+1 1 lshift .nl
+1 2 lshift .nl
+
+1 0 rshift .nl
+1 1 rshift .nl
+2 1 rshift .nl
+4 2 rshift .nl

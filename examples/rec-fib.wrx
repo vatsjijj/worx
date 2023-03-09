@@ -1,0 +1,5 @@
+fib : ( n1 -- n2 )
+  dup 1 > if
+    1 - dup 1 - fib swap fib + .stack then ;
+
+40 fib .nl

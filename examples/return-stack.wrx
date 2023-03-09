@@ -1,0 +1,2 @@
+1 2 3 .stack 2drop drop
+1 2 3 >r .stack 2drop .retstack r> .stack drop

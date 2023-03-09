@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"Jordan"
+	],
+	"copyright": "Copyright © 2023, Jordan",
+	"description": "WORX forth.",
+	"license": "MPL-2.0",
+	"name": "worx"
+}
