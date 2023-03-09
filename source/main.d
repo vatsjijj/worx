@@ -1,5 +1,5 @@
-import std.stdio;
 import core.exception : ArrayIndexError;
+import std.stdio;
 import std.file;
 import scan;
 import vm;

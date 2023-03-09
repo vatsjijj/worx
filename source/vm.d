@@ -15,7 +15,8 @@ class VM {
   private int jmpCount;
   private int beginWord = -1, endWord = -1;
   private int loc;
-  private string name, tok;
+  private immutable string name;
+  private string tok;
   private string[] toks;
   private Stack ds, rs;
   private Table variables;
@@ -23,14 +24,14 @@ class VM {
   private int[1024] topLim, botLim;
   private int level = 0;
 
-  this(string src) {
+  this(immutable string src) {
     this.jmpCount = 0;
     this.loc = 0;
     this.toks = scanner(src);
     this.tok = this.toks[this.loc];
     this.name = "VM";
   }
-  this(string name, string src) {
+  this(immutable string name, immutable string src) {
     this.jmpCount = 0;
     this.loc = 0;
     this.toks = scanner(src);
@@ -38,18 +39,18 @@ class VM {
     this.name = name;
   }
 
-  void adv() {
+  private void adv() {
     ++loc;
-    if (loc >= signed(toks.length)) {
+    if (loc >= toks.length) {
       return;
     }
     tok = toks[loc];
   }
 
-  Value toValue(string value) {
+  private static Value toValue(string value) {
     return Value(value);
   }
-  Value toValue(double value) {
+  private static Value toValue(double value) {
     return Value(value);
   }
 
@@ -154,7 +155,7 @@ class VM {
     return variables;
   }
 
-  void jump(int location) {
+  private void jump(int location) {
     if (location >= toks.length) {
       loc = location;
       return;
@@ -164,38 +165,38 @@ class VM {
   }
 
   // Helpers to make things easier.
-  void push(Value value) {
+  private void push(Value value) {
     ds.push(value);
   }
-  void push(int value) {
+  private void push(int value) {
     ds.push(value);
   }
-  void push(double value) {
+  private void push(double value) {
     ds.push(value);
   }
-  void push(string value) {
+  private void push(string value) {
     ds.push(value);
   }
 
-  Value pop() {
+  private Value pop() {
     return ds.pop();
   }
 
-  double getD() {
+  private double getD() {
     return pop().match!(
       (double d) => d,
       (string s) => 0
     );
   }
 
-  string getS() {
+  private string getS() {
     return pop().match!(
       (double d) => to!string(d),
       (string s) => s
     );
   }
 
-  bool tryMatchDouble(string tok) {
+  private static bool tryMatchDouble(string tok) {
     try {
       to!double(tok);
       return true;
@@ -206,7 +207,7 @@ class VM {
   }
   // End helpers.
 
-  void colon() {
+  private void colon() {
     string wname = getS();
     beginWord = loc + 1;
     while (toks[loc] != ";") {
@@ -216,132 +217,132 @@ class VM {
     words[wname] = [beginWord, endWord];
   }
 
-  void semicolon() {
+  private void semicolon() {
     jump(jmp[jmpCount - 1]);
     --jmpCount;
   }
 
-  void add() {
+  private void add() {
     double a = getD();
     double b = getD();
     push(b + a);
   }
 
-  void sub() {
+  private void sub() {
     double a = getD();
     double b = getD();
     push(b - a);
   }
 
-  void mul() {
+  private void mul() {
     double a = getD();
     double b = getD();
     push(b * a);
   }
 
-  void div() {
+  private void div() {
     double a = getD();
     double b = getD();
     push(b / a);
   }
 
-  void mod() {
+  private void mod() {
     double a = getD();
     double b = getD();
     push(b % a);
   }
 
-  void concat() {
+  private void concat() {
     string a = getS();
     string b = getS();
     push(b ~ a);
   }
 
-  void equals() {
+  private void equals() {
     push(
       pop() == pop() ? 1 : 0
     );
   }
 
-  void gt() {
+  private void gt() {
     push(
       getD() < getD() ? 1 : 0
     );
   }
 
-  void lt() {
+  private void lt() {
     push(
       getD() > getD() ? 1 : 0
     );
   }
 
-  void abs() {
+  private void abs() {
     int x = cast(int)getD();
     push(
       x < 0 ? -x : x
     );
   }
 
-  void lShift() {
+  private void lShift() {
     double u = getD();
     double x = getD();
     push((cast(int)x) <<
          (cast(int)u));
   }
 
-  void rShift() {
+  private void rShift() {
     double u = getD();
     double x = getD();
     push ((cast(int)x) >>
           (cast(int)u));
   }
 
-  void and() {
+  private void and() {
     double a = getD();
     double b = getD();
     push((cast(int)b) &
          (cast(int)a));
   }
 
-  void or() {
+  private void or() {
     double a = getD();
     double b = getD();
     push((cast(int)b) |
          (cast(int)a));
   }
 
-  void xor() {
+  private void xor() {
     double a = getD();
     double b = getD();
     push((cast(int)b) ^
          (cast(int)a));
   }
 
-  void invert() {
+  private void invert() {
     push(~(cast(int)getD()));
   }
 
   // Easier to understand.
-  void drop() {
+  private void drop() {
     pop();
   }
 
-  void variable() {
+  private void variable() {
     // X VARIABLE
     variables.set(getS());
   }
 
-  void store() {
+  private void store() {
     // 12 X !
     variables.set(getS(), pop());
   }
 
-  void fetch() {
+  private void fetch() {
     // X @
     push(variables.get(getS()));
   }
 
-  void cif() {
+  private void cif() {
     ++jmpCount;
     ++jmpCount;
     ++jmpCount;
@@ -380,7 +381,7 @@ class VM {
     }
   }
 
-  void celse() {
+  private void celse() {
     push("[]ivif");
     fetch();
     if (getD() == 1) {
@@ -393,7 +394,7 @@ class VM {
     }
   }
 
-  void cdo() {
+  private void cdo() {
     ++level;
     ++jmpCount;
     topLim[level - 1] = cast(int)getD();
@@ -401,7 +402,7 @@ class VM {
     jmp[jmpCount - 1] = loc;
   }
 
-  void qmdo() {
+  private void qmdo() {
     ++level;
     ++jmpCount;
     botLim[level - 1] = cast(int)getD();
@@ -410,39 +411,39 @@ class VM {
   }
 
   // Non-standard
-  void del() {
+  private void del() {
     variables.del(getS());
   }
 
   // Return stack operations.
-  void toR() {
+  private void toR() {
     rs.push(ds.pop());
   }
 
-  void rFrom() {
+  private void rFrom() {
     ds.push(rs.pop());
   }
 
-  void printReturnStack() {
+  private void printReturnStack() {
     writeln("RET: ", rs.stack);
   }
   // End return stack operations.
 
   // Misc.
-  void space() {
+  private void space() {
     write(" ");
   }
   // End misc.
 
-  void popPrint() {
+  private void popPrint() {
     write(getS());
   }
 
-  void popPrintLn() {
+  private void popPrintLn() {
     writeln(getS());
   }
 
-  void printStack() {
+  private void printStack() {
     writeln("NOR: ", ds.stack);
   }
 }

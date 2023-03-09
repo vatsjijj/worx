@@ -1,14 +1,14 @@
 module scan;
 
 import std.conv : signed;
+import words : FULL;
 import std.stdio;
 import std.uni;
-import words : FULL;
 
 private int location = 0;
 
 private bool inBounds(string src) {
-  return location < signed(src.length) - 1;
+  return location < (src.length) - 1;
 }
 
 private void comment(string src) {
@@ -46,7 +46,7 @@ private string str(string src) {
   return res ~ ":s";
 }
 
-string[] scanner(string src) {
+static string[] scanner(string src) {
   src = src ~ " \0 \0";
   src = FULL ~ src;
 
