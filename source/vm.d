@@ -55,7 +55,7 @@ class VM {
 
   // The run function.
   void run() {
-    while (loc < signed(toks.length)) {
+    while (loc < toks.length) {
       switch (tok.toLower()) {
         case "+": add(); break;
         case "-": sub(); break;
