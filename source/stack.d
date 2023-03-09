@@ -1,10 +1,6 @@
 module stack;
 
-import std.algorithm.mutation : remove;
-import core.stdc.stdlib : exit;
-import std.conv : signed;
 import std.sumtype;
-import std.stdio;
 
 alias Value = SumType!(double, string);
 
@@ -22,12 +18,18 @@ struct Stack {
   }
 
   Value pop() {
-    if (stack.length < 1) {
+    import core.exception : ArrayIndexError;
+    import core.stdc.stdlib : exit;
+    import std.stdio;
+    Value top;
+    try {
+      top = stack[$ - 1];
+      --stack.length;
+      return top;
+    }
+    catch (ArrayIndexError e) {
       stderr.writeln("Stack underflow.");
       exit(2);
     }
-    Value top = stack[$ - 1];
-    --stack.length;
-    return top;
   }
 }

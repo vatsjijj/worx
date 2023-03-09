@@ -99,18 +99,12 @@ final class VM {
           --jmpCount;
           --jmpCount;
           --jmpCount;
+          push("[]ivif");
+          del();
           break;
         case "do": cdo(); break;
         case "?do": qmdo(); break;
-        case "loop":
-          if (topLim[level - 1] - 1 > botLim[level - 1]) {
-            ++botLim[level - 1];
-            jump(jmp[jmpCount - 1]);
-            break;
-          }
-          --level;
-          --jmpCount;
-          break;
+        case "loop": loop(); break;
         case ":": colon(); break;
         case ";": semicolon(); break;
         // Misc.
@@ -336,14 +330,10 @@ final class VM {
   }
 
   private void swap() {
-    push("[]ivswap");
-    store();
-    toR();
-    push("[]ivswap");
-    fetch();
-    rFrom();
-    push("[]ivswap");
-    del();
+    Value a = pop();
+    Value b = pop();
+    push(a);
+    push(b);
   }
 
   private void nip() {
@@ -352,14 +342,9 @@ final class VM {
   }
 
   private void dup() {
-    push("[]ivdup");
-    store();
-    push("[]ivdup");
-    fetch();
-    push("[]ivdup");
-    fetch();
-    push("[]ivdup");
-    del();
+    Value a = pop();
+    push(a);
+    push(a);
   }
 
   private void rot() {
@@ -462,6 +447,16 @@ final class VM {
       push("[]ivif");
       del();
     }
+  }
+
+  private void loop() {
+    if (topLim[level - 1] - 1 > botLim[level - 1]) {
+      ++botLim[level - 1];
+      jump(jmp[jmpCount - 1]);
+      return;
+    }
+    --level;
+    --jmpCount;
   }
 
   private void cdo() {

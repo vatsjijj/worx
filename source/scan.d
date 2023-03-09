@@ -1,8 +1,5 @@
 module scan;
 
-import std.conv : signed;
-// import words : FULL;
-import std.stdio;
 import std.uni;
 
 private int location = 0;

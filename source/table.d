@@ -23,6 +23,7 @@ struct Table {
   }
 
   void del(string index) {
-    table.remove(index);
+    // table.remove(index);
+    table[index] = null;
   }
 }
