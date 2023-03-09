@@ -3,6 +3,8 @@ WORX programming language.
 
 WORX is a forth-like language, currently in its early stages.
 
+The stack in WORX at the moment is.... *Slow*... The strategy for faster programs at the current moment is to just avoid the stack entirely and use variables. This is being actively worked on.
+
 # Examples
 Examples can be found in the `examples` folder in the repository.
 
