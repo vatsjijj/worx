@@ -2,7 +2,7 @@ module vm;
 
 import std.algorithm.mutation : remove;
 import core.stdc.stdlib : exit;
-import std.variant;
+import std.sumtype;
 import std.string;
 import std.stdio;
 import std.conv;
@@ -44,6 +44,13 @@ class VM {
       return;
     }
     tok = toks[loc];
+  }
+
+  Value toValue(string value) {
+    return Value(value);
+  }
+  Value toValue(double value) {
+    return Value(value);
   }
 
   // The run function.
@@ -110,24 +117,24 @@ class VM {
         case "\0": return;
         // End misc.
         default:
-          try {
-            push(to!double(tok));
+          int[2]* ptr = tok in words;
+          if (tryMatchDouble(tok)) {
+            push(toValue(to!double(tok)));
           }
-          catch (ConvException e) {
-            if (tok[$ - 1] == 's' &&
-                tok[$ - 2] == ':') {
-              push(tok[0..($ - 2)]);
-            }
-            else {
-              int[2]* ptr = tok in words;
-              if (ptr !is null) {
-                ++jmpCount;
-                jmp[jmpCount - 1] = loc;
-                jump(words[tok][0] - 1);
-                break;
-              }
-              push(tok);
-            }
+          else if (tok[$ - 1] == 's' &&
+              tok[$ - 2] == ':') {
+            push(tok[0..($ - 2)]);
+            break;
+          }
+          else if (ptr !is null) {
+            ++jmpCount;
+            jmp[jmpCount - 1] = loc;
+            jump(words[tok][0] - 1);
+            break;
+          }
+          else {
+            push(tok);
+            break;
           }
           break;
       }
@@ -157,7 +164,10 @@ class VM {
   }
 
   // Helpers to make things easier.
-  void push(Variant value) {
+  void push(Value value) {
+    ds.push(value);
+  }
+  void push(int value) {
     ds.push(value);
   }
   void push(double value) {
@@ -167,13 +177,37 @@ class VM {
     ds.push(value);
   }
 
-  Variant pop() {
+  Value pop() {
     return ds.pop();
+  }
+
+  double getD() {
+    return pop().match!(
+      (double d) => d,
+      (string s) => 0
+    );
+  }
+
+  string getS() {
+    return pop().match!(
+      (double d) => to!string(d),
+      (string s) => s
+    );
+  }
+
+  bool tryMatchDouble(string tok) {
+    try {
+      to!double(tok);
+      return true;
+    }
+    catch (ConvException e) {
+      return false;
+    }
   }
   // End helpers.
 
   void colon() {
-    string wname = pop().get!string;
+    string wname = getS();
     beginWord = loc + 1;
     while (toks[loc] != ";") {
       adv();
@@ -188,69 +222,39 @@ class VM {
   }
 
   void add() {
-    Variant a = pop();
-    Variant b = pop();
-    try {
-      push(b + a);
-    }
-    catch (VariantException e) {
-      push(0);
-    }
+    double a = getD();
+    double b = getD();
+    push(b + a);
   }
 
   void sub() {
-    Variant a = pop();
-    Variant b = pop();
-    try {
-      push(b - a);
-    }
-    catch (VariantException e) {
-      push(0);
-    }
+    double a = getD();
+    double b = getD();
+    push(b - a);
   }
 
   void mul() {
-    Variant a = pop();
-    Variant b = pop();
-    try {
-      push(b * a);
-    }
-    catch (VariantException e) {
-      push(0);
-    }
+    double a = getD();
+    double b = getD();
+    push(b * a);
   }
 
   void div() {
-    Variant a = pop();
-    Variant b = pop();
-    try {
-      push(b / a);
-    }
-    catch (VariantException e) {
-      push(0);
-    }
+    double a = getD();
+    double b = getD();
+    push(b / a);
   }
 
   void mod() {
-    Variant a = pop();
-    Variant b = pop();
-    try {
-      push (b.get!double % a.get!double);
-    }
-    catch (VariantException e) {
-      push(-1);
-    }
+    double a = getD();
+    double b = getD();
+    push(b % a);
   }
 
   void concat() {
-    Variant a = pop();
-    Variant b = pop();
-    try {
-      push(b ~ to!string(a));
-    }
-    catch (VariantException e) {
-      push(0);
-    }
+    string a = getS();
+    string b = getS();
+    push(b ~ a);
   }
 
   void equals() {
@@ -261,60 +265,60 @@ class VM {
 
   void gt() {
     push(
-      pop() < pop() ? 1 : 0
+      getD() < getD() ? 1 : 0
     );
   }
 
   void lt() {
     push(
-      pop() > pop() ? 1 : 0
+      getD() > getD() ? 1 : 0
     );
   }
 
   void abs() {
-    int x = cast(int)pop().get!double;
+    int x = cast(int)getD();
     push(
       x < 0 ? -x : x
     );
   }
 
   void lShift() {
-    Variant u = pop();
-    Variant x = pop();
-    push((cast(int)x.get!double) <<
-         (cast(int)u.get!double));
+    double u = getD();
+    double x = getD();
+    push((cast(int)x) <<
+         (cast(int)u));
   }
 
   void rShift() {
-    Variant u = pop();
-    Variant x = pop();
-    push ((cast(int)x.get!double) >>
-          (cast(int)u.get!double));
+    double u = getD();
+    double x = getD();
+    push ((cast(int)x) >>
+          (cast(int)u));
   }
 
   void and() {
-    Variant a = pop();
-    Variant b = pop();
-    push((cast(int)b.get!double) &
-         (cast(int)a.get!double));
+    double a = getD();
+    double b = getD();
+    push((cast(int)b) &
+         (cast(int)a));
   }
 
   void or() {
-    Variant a = pop();
-    Variant b = pop();
-    push((cast(int)b.get!double) |
-         (cast(int)a.get!double));
+    double a = getD();
+    double b = getD();
+    push((cast(int)b) |
+         (cast(int)a));
   }
 
   void xor() {
-    Variant a = pop();
-    Variant b = pop();
-    push((cast(int)b.get!double) ^
-         (cast(int)a.get!double));
+    double a = getD();
+    double b = getD();
+    push((cast(int)b) ^
+         (cast(int)a));
   }
 
   void invert() {
-    push(~(cast(int)pop().get!double));
+    push(~(cast(int)getD()));
   }
 
   // Easier to understand.
@@ -324,17 +328,17 @@ class VM {
 
   void variable() {
     // X VARIABLE
-    variables.set(to!string(pop()));
+    variables.set(getS());
   }
 
   void store() {
     // 12 X !
-    variables.set(to!string(pop()), pop());
+    variables.set(getS(), pop());
   }
 
   void fetch() {
     // X @
-    push(variables.get(to!string(pop())));
+    push(variables.get(getS()));
   }
 
   void cif() {
@@ -365,7 +369,7 @@ class VM {
     store();
     push("[]ivif");
     fetch();
-    if (pop() == 1) {
+    if (getD() == 1) {
       jump(jmp[jmpCount - 3]);
     }
     else if (jmp[jmpCount - 2] > -1) {
@@ -379,7 +383,7 @@ class VM {
   void celse() {
     push("[]ivif");
     fetch();
-    if (pop() == 1) {
+    if (getD() == 1) {
       jump(jmp[jmpCount - 1] - 1);
     }
     else {
@@ -392,7 +396,7 @@ class VM {
   void cdo() {
     ++level;
     ++jmpCount;
-    topLim[level - 1] = cast(int)pop().get!double;
+    topLim[level - 1] = cast(int)getD();
     botLim[level - 1] = 0;
     jmp[jmpCount - 1] = loc;
   }
@@ -400,14 +404,14 @@ class VM {
   void qmdo() {
     ++level;
     ++jmpCount;
-    botLim[level - 1] = cast(int)pop().get!double;
-    topLim[level - 1] = cast(int)pop().get!double;
+    botLim[level - 1] = cast(int)getD();
+    topLim[level - 1] = cast(int)getD();
     jmp[jmpCount - 1] = loc;
   }
 
   // Non-standard
   void del() {
-    variables.del(to!string(pop()));
+    variables.del(getS());
   }
 
   // Return stack operations.
@@ -431,11 +435,11 @@ class VM {
   // End misc.
 
   void popPrint() {
-    write(pop());
+    write(getS());
   }
 
   void popPrintLn() {
-    writeln(pop());
+    writeln(getS());
   }
 
   void printStack() {

@@ -1,25 +1,25 @@
 module table;
 
-import std.variant;
+import stack : Value;
 
 struct Table {
-  Variant[string] table = null;
+  Value[string] table = null;
 
-  Variant get(string index) {
+  Value get(string index) {
     return table[index];
   }
 
   void set(string index) {
     table[index] = null;
   }
-  void set(string index, Variant value) {
+  void set(string index, Value value) {
     table[index] = value;
   }
   void set(string index, double value) {
-    table[index] = Variant(value);
+    table[index] = Value(value);
   }
   void set(string index, string value) {
-    table[index] = Variant(value);
+    table[index] = Value(value);
   }
 
   void del(string index) {

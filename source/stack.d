@@ -3,28 +3,30 @@ module stack;
 import std.algorithm.mutation : remove;
 import core.stdc.stdlib : exit;
 import std.conv : signed;
-import std.variant;
+import std.sumtype;
 import std.stdio;
 
-struct Stack {
-  Variant[] stack = null;
+alias Value = SumType!(double, string);
 
-  void push(Variant value) {
+struct Stack {
+  Value[] stack = null;
+
+  void push(Value value) {
     stack ~= value;
   }
   void push(double value) {
-    stack ~= Variant(value);
+    stack ~= Value(value);
   }
   void push(string value) {
-    stack ~= Variant(value);
+    stack ~= Value(value);
   }
 
-  Variant pop() {
+  Value pop() {
     if (stack.length < 1) {
       stderr.writeln("Stack underflow.");
       exit(2);
     }
-    Variant top = stack[$ - 1];
+    Value top = stack[$ - 1];
     --stack.length;
     return top;
   }
