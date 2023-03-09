@@ -1,7 +1,5 @@
 module vm;
 
-import std.algorithm.mutation : remove;
-import core.stdc.stdlib : exit;
 import std.sumtype;
 import std.string;
 import std.stdio;
@@ -70,7 +68,7 @@ final class VM {
         case "variable": variable(); break;
         case "!": store(); break;
         case "@": fetch(); break;
-        case "del": del(); break; // Non-standard behavior.
+        case "del": del(); break;
         case "and": and(); break;
         case "or": or(); break;
         case "xor": xor(); break;
@@ -109,9 +107,6 @@ final class VM {
         case ";": semicolon(); break;
         // Misc.
         case "space": space(); break;
-        case "min-num": push(double.min_normal); break;
-        case "max-num": push(double.max_exp); break;
-        case "exit": jump(jmp[jmpCount - 1] + 1); break;
         case "\0": return;
         // End misc.
         default:
@@ -163,9 +158,6 @@ final class VM {
 
   // Helpers to make things easier.
   private void push(Value value) {
-    ds.push(value);
-  }
-  private void push(int value) {
     ds.push(value);
   }
   private void push(double value) {
