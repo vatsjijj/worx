@@ -1,7 +1,7 @@
 module scan;
 
 import std.conv : signed;
-import words : FULL;
+// import words : FULL;
 import std.stdio;
 import std.uni;
 
@@ -48,7 +48,7 @@ private string str(string src) {
 
 static string[] scanner(string src) {
   src = src ~ " \0 \0";
-  src = FULL ~ src;
+  // src = FULL ~ src;
 
   string[] res = [];
 

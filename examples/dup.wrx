@@ -1,2 +1,3 @@
 1 .stack drop
 1 dup .stack 2drop
+1 2 2dup .stack 2drop 2drop

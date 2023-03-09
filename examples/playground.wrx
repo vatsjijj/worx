@@ -5,7 +5,7 @@
 r@ 1 ?do
   r@ 1 ?do
     r@ i r> % 0 = if
-      i r> +
+      i r> + .stack
     then
   loop
   r@ swap >r r@ = if

@@ -10,7 +10,7 @@ import stack;
 import table;
 import scan;
 
-class VM {
+final class VM {
   private int[1024] jmp;
   private int jmpCount;
   private int beginWord = -1, endWord = -1;
@@ -47,13 +47,6 @@ class VM {
     tok = toks[loc];
   }
 
-  private static Value toValue(string value) {
-    return Value(value);
-  }
-  private static Value toValue(double value) {
-    return Value(value);
-  }
-
   // The run function.
   void run() {
     while (loc < toks.length) {
@@ -82,6 +75,16 @@ class VM {
         case "or": or(); break;
         case "xor": xor(); break;
         case "invert": invert(); break;
+        case "2drop": drop2(); break;
+        case "swap": swap(); break;
+        case "nip": nip(); break;
+        case "dup": dup(); break;
+        case "rot": rot(); break;
+        case "over": over(); break;
+        case "2dup": dup2(); break;
+        case "2>r": toR2(); break;
+        case "2r>": rFrom2(); break;
+        case "r@": rFetch(); break;
         // Return stack.
         case "i": rs.push(botLim[level - 1]); break;
         case ".retstack": printReturnStack(); break;
@@ -120,7 +123,7 @@ class VM {
         default:
           int[2]* ptr = tok in words;
           if (tryMatchDouble(tok)) {
-            push(toValue(to!double(tok)));
+            push(to!double(tok));
           }
           else if (tok[$ - 1] == 's' &&
               tok[$ - 2] == ':') {
@@ -325,6 +328,73 @@ class VM {
   // Easier to understand.
   private void drop() {
     pop();
+  }
+
+  private void drop2() {
+    drop();
+    drop();
+  }
+
+  private void swap() {
+    push("[]ivswap");
+    store();
+    toR();
+    push("[]ivswap");
+    fetch();
+    rFrom();
+    push("[]ivswap");
+    del();
+  }
+
+  private void nip() {
+    swap();
+    drop();
+  }
+
+  private void dup() {
+    push("[]ivdup");
+    store();
+    push("[]ivdup");
+    fetch();
+    push("[]ivdup");
+    fetch();
+    push("[]ivdup");
+    del();
+  }
+
+  private void rot() {
+    toR();
+    swap();
+    rFrom();
+    swap();
+  }
+
+  private void over() {
+    toR();
+    dup();
+    rFrom();
+    swap();
+  }
+
+  private void dup2() {
+    over();
+    over();
+  }
+
+  private void toR2() {
+    toR();
+    toR();
+  }
+
+  private void rFrom2() {
+    rFrom();
+    rFrom();
+  }
+
+  private void rFetch() {
+    rFrom();
+    dup();
+    toR();
   }
 
   private void variable() {

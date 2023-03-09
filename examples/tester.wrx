@@ -7,7 +7,7 @@
 NUM @ 1 ?do
   NUM @ 1 ?do
     NUM @ i r> % 0 = if
-      SUM @ i r> + SUM !
+      SUM @ i r> + .stack SUM !
     then
   loop
   NUM @ SUM @ = if
